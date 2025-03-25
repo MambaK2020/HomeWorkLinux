@@ -1,0 +1,34 @@
+###Redeploy filebeats 
+```
+for fb in $(kubectl get pods | grep file| awk '{print $1}'); do echo $fb && sleep 5 && kubectl delete pod $fb; done
+```
+###Execute commant via ssh on every node
+```
+for nodeip in $( kubectl get nodes -o wide | awk '{print $6}' | tail +2 ); do echo $nodeip && sleep 1 && ssh -o "StrictHostKeyChecking no" -i ~/Projects/eks-cluster-stag-2.pem ec2-user@$nodeip 'sudo rm -rf /var/lib/filebeat-data/registry/'; done
+```
+###Get IPs
+kubectl get pods -o jsonpath='{range .items[*]}{.status.hostIP}{"\n"}{end}' | sort -u
+
+
+## Add kibana index pattern of all namespaces
+# For all namespaces
+#!/bin/bash
+ES_ENDPOINT=
+NS=
+
+for NS in $(kubectl get ns | awk '{print $1}'| tail +2)
+  do
+    curl -X POST  "$ES_ENDPOINT/_plugin/kibana/api/saved_objects/index-pattern/$NS" -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -d"
+{
+  \"attributes\": {
+    \"title\": \"ns-${NS}-*\",
+    \"timeFieldName\": \"@timestamp\"
+  }
+}
+"
+    sleep 1
+  done
+
+
+### Simple endless loop 
+while true; do echo "hello" && date && sleep 2; done
