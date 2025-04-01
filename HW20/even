@@ -1,0 +1,22 @@
+#!/bin/bash
+
+NUM_FILES=100
+RANDOM_DIR="/opt/131224-wdm/AlexN/HW20/Random"
+EVEN_DIR="/opt/131224-wdm/AlexN/HW20/Even"
+
+
+	for i in $(seq 1 $NUM_FILES); do
+	RANDOM_NAME=$((RANDOM % 1000000))
+	touch "$RANDOM_DIR/$RANDOM_NAME.txt"
+done
+
+	
+	for file in "$RANDOM_DIR"/*.txt; do
+	filename=$(basename "$file" .txt)
+
+	if (( filename % 2 == 0)); then
+	mv "$file" "$EVEN_DIR/"
+
+fi
+
+done
